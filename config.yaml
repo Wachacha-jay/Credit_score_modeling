@@ -1,0 +1,114 @@
+# Loan Approval System Configuration
+
+# Data Configuration
+data:
+  raw_data_path: "data/raw/loan_approval_dataset.csv"
+  train_data_path: "data/processed/train.csv"
+  test_data_path: "data/processed/test.csv"
+  test_size: 0.2
+  random_state: 42
+  stratify: True
+
+# Data Transformation
+transformation:
+  numerical_features:
+    - no_of_dependents
+    - income_annum
+    - loan_amount
+    - loan_term
+    - credit_score
+    - residential_assets_value
+    - commercial_assets_value
+    - luxury_assets_value
+    - bank_asset_value
+  
+  categorical_features:
+    - education
+    - self_employed
+  
+  target_column: "loan_status"
+  
+  drop_columns:
+    - loan_id
+  
+  outlier_removal:
+    method: "iqr"
+    multiplier: 1.5
+  
+  scaling_method: "standard"
+
+# Model Training
+model_training:
+  models:
+    logistic_regression:
+      enabled: True
+      params:
+        C: [0.001, 0.01, 0.1, 1, 10, 100]
+        max_iter: 1000
+    
+    random_forest:
+      enabled: True
+      params:
+        n_estimators: [100, 200, 500]
+        max_depth: [5, 10, 20]
+        min_samples_split: [2, 5, 10]
+        random_state: 42
+    
+    xgboost:
+      enabled: True
+      params:
+        n_estimators: [100, 200, 500]
+        learning_rate: [0.01, 0.1, 0.2]
+        max_depth: [3, 5, 7]
+        random_state: 42
+  
+  cv_folds: 5
+  scoring: "accuracy"
+
+# Model Evaluation
+evaluation:
+  metrics:
+    - accuracy
+    - precision
+    - recall
+    - f1_score
+    - roc_auc
+  
+  threshold: 0.85
+
+# Artifacts
+artifacts:
+  root_dir: "data/artifacts"
+  model_dir: "data/artifacts/models"
+  scaler_path: "data/artifacts/scaler.pkl"
+  encoder_path: "data/artifacts/encoder.pkl"
+  preprocessor_path: "data/artifacts/preprocessor.pkl"
+
+# MLflow Configuration
+mlflow:
+  enabled: True
+  tracking_uri: "https://dagshub.com/Wachacha-jay/my-first-repo.mlflow"
+  experiment_name: "Loan_Approval_System"
+  run_name_prefix: "run"
+  registered_model_name: "LoanApprovalModel"
+
+# API Configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: True
+  workers: 4
+
+# Airflow Configuration
+airflow:
+  dag_id: "loan_approval_pipeline"
+  schedule_interval: "@daily"
+  start_date: "2025-01-01"
+  catchup: False
+  max_active_runs: 1
+
+# SHAP Explainer
+explainer:
+  enabled: True
+  sample_size: 100
+  max_display: 10
